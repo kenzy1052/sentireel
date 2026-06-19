@@ -3,12 +3,14 @@
 
 Flask==3.0.3
 flask-cors==4.0.1
-joblib==1.4.2
-numpy==1.26.4
-scikit-learn==1.4.2
+gunicorn==22.0.0
+joblib==1.5.1
+numpy==2.3.4
+scikit-learn==1.7.1
+scipy==1.16.3
 textblob==0.18.0.post0
 nltk==3.8.1
-gunicorn==22.0.0
+
 
 # Used only by train_models.py / the EDA notebook (not required to run the app)
 pandas==2.2.2
