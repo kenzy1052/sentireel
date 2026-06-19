@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Movie Review Sentiment Analysis | AI-Powered Cinematic Insight</title>
+  <meta name="description"
+        content="A premium AI system that analyses movie reviews and predicts positive or negative sentiment using TextBlob, Naive Bayes, Logistic Regression and SVM." />
+
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Sora:wght@600;700;800&display=swap"
+        rel="stylesheet" />
+
+  <!-- Stylesheet -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}" />
+</head>
+
+<body>
+  <!-- Ambient gradient glow -->
+  <div class="ambient-glow" aria-hidden="true"></div>
+
+  <!-- ───────────────── NAVBAR ───────────────── -->
+  <header class="navbar">
+    <a class="brand" href="/">
+      <span class="brand-mark">SENTI<span class="brand-accent">REEL</span></span>
+    </a>
+    <nav class="nav-links">
+      <a href="#analyze">Analyse</a>
+      <a href="#how">How it works</a>
+      <span class="nav-badge"><span class="pulse"></span> 4 models online</span>
+    </nav>
+  </header>
+
+  <!-- ───────────────── HERO ───────────────── -->
+  <section class="hero">
+    <div class="hero-bg" style="background-image:url('{{ url_for('static', filename='images/hero-cinema.jpg') }}');"></div>
+    <div class="hero-overlay"></div>
+
+    <div class="hero-content">
+      <span class="eyebrow">AI · NLP · MACHINE LEARNING</span>
+      <h1>Movie Review<br /><span class="grad-text">Sentiment Analysis</span></h1>
+      <p class="hero-sub">
+        Paste any movie review and our ensemble of four intelligent models reads
+        between the lines — instantly predicting whether the verdict is
+        <span class="pos-word">positive</span> or <span class="neg-word">negative</span>,
+        with full confidence breakdowns.
+      </p>
+      <a href="#analyze" class="hero-cta">Analyse a review ↓</a>
+
+      <div class="hero-stats">
+        <div><strong>4</strong><span>ML / NLP models</span></div>
+        <div><strong>10K</strong><span>vocabulary features</span></div>
+        <div><strong>&lt;1s</strong><span>prediction time</span></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ───────────────── ANALYSE ───────────────── -->
+  <main class="container">
+    <section id="analyze" class="analyze-section">
+      <div class="section-head">
+        <h2>Drop your review in the projector</h2>
+        <p>The system cleans the text, vectorises it, and runs every model in parallel.</p>
+      </div>
+
+      <!-- Glassmorphism input card -->
+      <div class="glass-card input-card">
+        <label for="reviewInput" class="field-label">Movie review</label>
+        <textarea
+          id="reviewInput"
+          placeholder="e.g. An absolute masterpiece — gripping from the first frame, with a haunting score and career-best performances..."
+          maxlength="5000"></textarea>
+
+        <div class="input-footer">
+          <div class="counters">
+            <span id="charCount">0</span> characters ·
+            <span id="wordCount">0</span> words
+          </div>
+          <div class="input-actions">
+            <button id="sampleBtn" class="btn btn-ghost" type="button">Try a sample</button>
+            <button id="clearBtn" class="btn btn-ghost" type="button">Clear</button>
+            <button id="analyzeBtn" class="btn btn-primary" type="button">
+              <span class="btn-label">Analyse Review</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Loading experience -->
+      <div id="loadingPanel" class="glass-card loading-panel" hidden>
+        <div class="reel-spinner" aria-hidden="true">
+          <span></span><span></span><span></span>
+        </div>
+        <div class="loading-stages">
+          <p id="loadingStage" class="loading-stage">Scanning movie review…</p>
+          <div class="loading-track"><div id="loadingBar" class="loading-bar"></div></div>
+        </div>
+      </div>
+
+      <!-- Error -->
+      <div id="errorPanel" class="error-panel" hidden></div>
+    </section>
+
+    <!-- ───────────────── RESULTS ───────────────── -->
+    <section id="resultsPanel" class="results-section" hidden>
+      <!-- Final verdict -->
+      <div id="verdictCard" class="glass-card verdict-card">
+        <div class="verdict-left">
+          <span class="verdict-eyebrow">Final ensemble verdict</span>
+          <h3 id="verdictText" class="verdict-text">POSITIVE REVIEW</h3>
+          <p id="verdictSub" class="verdict-sub">3 of 4 models agree on this sentiment.</p>
+        </div>
+        <div class="verdict-right">
+          <div class="confidence-ring">
+            <svg viewBox="0 0 120 120">
+              <circle class="ring-bg" cx="60" cy="60" r="52" />
+              <circle id="ringProgress" class="ring-progress" cx="60" cy="60" r="52" />
+            </svg>
+            <div class="ring-label">
+              <strong id="ensembleConfidence">0%</strong>
+              <span>confidence</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Model comparison -->
+      <div class="glass-card models-card">
+        <div class="card-head">
+          <h3>Model comparison</h3>
+          <span class="muted">Confidence per model</span>
+        </div>
+        <div id="modelBars" class="model-bars"><!-- injected --></div>
+      </div>
+
+      <!-- Stats -->
+      <div class="stats-grid">
+        <div class="glass-card stat-card">
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h16M4 12h16M4 18h10"/></svg>
+          </span>
+          <strong id="statWords">0</strong>
+          <span>Words analysed</span>
+        </div>
+        <div class="glass-card stat-card">
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 7V5h14v2M9 19h6M12 5v14"/></svg>
+          </span>
+          <strong id="statChars">0</strong>
+          <span>Characters</span>
+        </div>
+        <div class="glass-card stat-card">
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8z"/></svg>
+          </span>
+          <strong id="statTime">0 ms</strong>
+          <span>Processing time</span>
+        </div>
+        <div class="glass-card stat-card">
+          <span class="stat-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.4" fill="currentColor"/></svg>
+          </span>
+          <strong id="statPolarity">0.00</strong>
+          <span>TextBlob polarity</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ───────────────── HOW IT WORKS ───────────────── -->
+    <section id="how" class="how-section">
+      <div class="section-head">
+        <h2>How the pipeline thinks</h2>
+        <p>From raw text to a confident verdict in five intelligent steps.</p>
+      </div>
+      <div class="pipeline">
+        <div class="pipe-step"><span class="pipe-num">01</span><h4>Clean</h4><p>HTML, noise and stopwords are stripped; words are lemmatised to their root form.</p></div>
+        <div class="pipe-step"><span class="pipe-num">02</span><h4>Vectorise</h4><p>TF-IDF converts the review into a 10,000-feature numeric fingerprint.</p></div>
+        <div class="pipe-step"><span class="pipe-num">03</span><h4>Predict</h4><p>Naive Bayes, Logistic Regression and SVM each cast an independent vote.</p></div>
+        <div class="pipe-step"><span class="pipe-num">04</span><h4>Read tone</h4><p>TextBlob reads the raw emotional polarity straight from the language.</p></div>
+        <div class="pipe-step"><span class="pipe-num">05</span><h4>Decide</h4><p>A majority vote fuses every signal into one confident final verdict.</p></div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p>SENTIREEL · Movie Review Sentiment Analysis · Built with Python, Flask, NLTK & scikit-learn</p>
+  </footer>
+
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
